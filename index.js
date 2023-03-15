@@ -25,6 +25,15 @@ function operation() {
         
         if (action === 'Criar uma nova conta') {
             createAcc()
+        } else if (action === 'Consultar seu saldo') {
+
+        } else if (action === 'Realizar um deposito') {
+
+        } else if (action === 'Realizar um saque') {
+
+        } else if (action === 'Sair do sistema') {
+            console.log(chalk.bgBlue.black('Obrigado por utilizar o nosso sistema.'))
+            process.exit()
         }
     })
     .catch((err) => console.log(err))
