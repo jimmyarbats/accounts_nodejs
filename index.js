@@ -5,8 +5,7 @@ const inquirer = require('inquirer');
 
 operation()
 
-// creating options menu
-
+// init system
 function operation() {
     inquirer.prompt([
         {
@@ -32,7 +31,7 @@ function operation() {
         } else if (action === 'Realizar um deposito') {
             deposit()
         } else if (action === 'Realizar um saque') {
-
+            withdraw()
         } else if (action === 'Sair do sistema') {
             console.log(chalk.bgBlue.black('Obrigado por utilizar o nosso sistema.'))
             process.exit()
@@ -95,7 +94,6 @@ function buildAcc() {
 }
 
 // deposit function
-
 function deposit() {
     inquirer.prompt([
         {
@@ -190,4 +188,66 @@ function getBalance() {
         operation()
     })
     .catch(err => console.log(err))
+}
+
+// withdraw from user acc
+function withdraw() {
+    inquirer.prompt([
+        {
+            name: 'accName',
+            message: "Qual o nome de usuario da sua conta? ",
+        },
+    ])
+    .then((answer) => {
+        const accName = answer['accName']
+
+        // verify if acc exists
+        if (!checkAcc(accName)) {
+            return withdraw()
+        }
+
+        inquirer.prompt([
+            {
+                name: 'amount',
+                message: "Qual o valor do saque? ",
+            },
+        ])
+        .then((answer) => {
+            const amount = answer['amount']
+            
+            removeAmount(accName, amount)
+        })
+        .catch(err => console.log(err))
+    })
+    .catch(err => console.log(err))
+    
+}
+
+function removeAmount(accName, amount) {
+    const acc = getAcc(accName)
+
+    // verfy if amount is valid
+    if (!amount) {
+        console.log(chalk.bgRed.black('Ops, ocorreu um erro. Tente novamente. '))
+        return withdraw()
+    }
+
+    // verify if the user has suficient amount
+    if (acc.balance < amount) {
+        console.log(chalk.bgRed.black('Você não possui saldo suficiente para essa transação. '))
+        return withdraw()
+    }
+
+    acc.balance = parseFloat(acc.balance) - parseFloat(amount)
+    fs.writeFileSync(
+        `accounts/${accName}.json`,
+        JSON.stringify(acc),
+        function (err) {
+            console.log(err)
+        },
+    )
+
+    console.log(chalk.green(`Você sacou R$${amount} da conta: ${accName}`))
+    
+    operation()
 }
