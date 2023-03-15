@@ -28,7 +28,7 @@ function operation() {
         if (action === 'Criar uma nova conta') {
             createAcc()
         } else if (action === 'Consultar seu saldo') {
-
+            getBalance()
         } else if (action === 'Realizar um deposito') {
             deposit()
         } else if (action === 'Realizar um saque') {
@@ -166,4 +166,28 @@ function getAcc(accName) {
         flag: 'r',
     })
     return JSON.parse(accJSON)
+}
+
+// show acc balance
+function getBalance() {
+    inquirer.prompt([
+        {
+            name: "accName",
+            message: "Qual o nome de usuario da sua conta? "
+        }
+    ])
+    .then((answer) => {
+        const accName = answer['accName']
+
+        // verify if acc exists
+        if (!checkAcc(accName)) {
+            return getBalance()
+        }
+
+        const acc = getAcc(accName)
+        console.log(chalk.bgBlue.black(`Ola, ${accName}, o saldo da sua conta é de R$${acc.balance}`))
+
+        operation()
+    })
+    .catch(err => console.log(err))
 }
